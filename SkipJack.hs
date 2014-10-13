@@ -71,10 +71,3 @@ decrypt w key = foldr foldFunc w [1..32]
   where foldFunc k w
           | shouldRuleA k = ruleAminus1 key w k
           | otherwise = ruleBMinus1 key w k
-
-main :: IO ()
-main = do
-  print $ 1 == combineTwoWord8 (splitWord16 1)
-  print $ (1, 2, 3, 4) == decrypt enc key
-    where key = pack [1..10]
-          enc = encrypt (1, 2, 3, 4) key
