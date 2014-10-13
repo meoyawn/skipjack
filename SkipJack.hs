@@ -47,17 +47,9 @@ ruleBMinus1 (w1, w2, w3, w4) counter key = (gRw2, gRw2 `xor` w3 `xor` (fromInteg
   where gRw2 = gR w2 counter key
 
 g :: Word16 -> Int -> ByteString -> Word16
-g w k key = combineWord8s [g5, g6]
-  where (g1:g2:[]) = splitWord16 w
-        g3 = (fTable ! (fromIntegral $ g2 `xor` (index key $ (4 * k) `mod` 10))) `xor` g1
-        g4 = (fTable ! (fromIntegral $ g3 `xor` (index key $ (4 * k + 1) `mod` 10))) `xor` g2
-        g5 = (fTable ! (fromIntegral $ g4 `xor` (index key $ (4 * k + 2) `mod` 10))) `xor` g3
-        g6 = (fTable ! (fromIntegral $ g5 `xor` (index key $ (4 * k + 3) `mod` 10))) `xor` g4
-
-gCool :: Word16 -> Int -> ByteString -> Word16
-gCool w k key = combineWord8s $ foldl foldFunc (splitWord16 w) [0..3]
-  where foldFunc :: [Word8] -> Int -> [Word8]
-        foldFunc = undefined
+g w k key = combineWord8s $ foldl (foldFunc k) (splitWord16 w) [0..3]
+  where foldFunc :: Int -> [Word8] -> Int -> [Word8]
+        foldFunc k (g1:g2:[]) i = [g2, (fTable ! (fromIntegral $ g2 `xor` (index key $ (4 * k + i) `mod` 10))) `xor` g1]
 
 gR :: Word16 -> Int -> ByteString -> Word16
 gR w k key = combineWord8s [g1, g2]
