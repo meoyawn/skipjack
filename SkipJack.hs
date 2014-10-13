@@ -28,8 +28,8 @@ fTable = fromList [0xa3,0xd7,0x09,0x83,0xf8,0x48,0xf6,0xf4,0xb3,0x21,0x15,0x78,0
 splitWord16 :: Word16 -> [Word8]
 splitWord16 x = map fromIntegral [ x .&. 0xFF, (x .&. 0xFF00) `shiftR` 8 ]
 
-combineWord8s :: [Word8] -> Word16
-combineWord8s xs = (y `shiftL` 8) .|. x
+combineTwoWord8 :: [Word8] -> Word16
+combineTwoWord8 xs = (y `shiftL` 8) .|. x
   where (x:y:[]) = map fromIntegral xs
 
 ruleA :: Word16x4 -> Int -> ByteString -> Word16x4
@@ -47,17 +47,12 @@ ruleBMinus1 (w1, w2, w3, w4) counter key = (gRw2, gRw2 `xor` w3 `xor` (fromInteg
   where gRw2 = gR w2 counter key
 
 g :: Word16 -> Int -> ByteString -> Word16
-g w k key = combineWord8s $ foldl (foldFunc k) (splitWord16 w) [0..3]
-  where foldFunc :: Int -> [Word8] -> Int -> [Word8]
-        foldFunc k (g1:g2:[]) i = [g2, (fTable ! (fromIntegral $ g2 `xor` (index key $ (4 * k + i) `mod` 10))) `xor` g1]
+g w k key = combineTwoWord8 $ foldl (foldFunc k) (splitWord16 w) [0..3]
+  where foldFunc k (g1:g2:[]) i = [g2, (fTable ! (fromIntegral $ g2 `xor` (index key $ (4 * k + i) `mod` 10))) `xor` g1]
 
 gR :: Word16 -> Int -> ByteString -> Word16
-gR w k key = combineWord8s [g1, g2]
-  where (g5:g6:[]) = splitWord16 w
-        g4 = (fTable ! (fromIntegral $ g5 `xor` (index key $ (4 * k + 3) `mod` 10))) `xor` g6
-        g3 = (fTable ! (fromIntegral $ g4 `xor` (index key $ (4 * k + 2) `mod` 10))) `xor` g5
-        g2 = (fTable ! (fromIntegral $ g3 `xor` (index key $ (4 * k + 1) `mod` 10))) `xor` g4
-        g1 = (fTable ! (fromIntegral $ g2 `xor` (index key $ (4 * k) `mod` 10))) `xor` g3
+gR w k key = combineTwoWord8 $ foldr (foldFunc k) (splitWord16 w) [0..3]
+  where foldFunc k i (g5:g6:[]) = [(fTable ! (fromIntegral $ g5 `xor` (index key $ (4 * k + i) `mod` 10))) `xor` g6, g5]
 
 shouldRuleA :: Int -> Bool
 shouldRuleA k = k <= 8 || 17 <= k && k <= 24
@@ -76,7 +71,7 @@ decrypt w key = foldl foldFunc w [32,31..1]
 
 main :: IO ()
 main = do
-  print $ 1 == combineWord8s (splitWord16 1)
+  print $ 1 == combineTwoWord8 (splitWord16 1)
   print $ (1, 2, 3, 4) == decrypt enc key
     where key = pack [1..10]
           enc = encrypt (1, 2, 3, 4) key
