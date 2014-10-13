@@ -32,42 +32,45 @@ combineTwoWord8 :: [Word8] -> Word16
 combineTwoWord8 xs = (y `shiftL` 8) .|. x
   where (x:y:[]) = map fromIntegral xs
 
-ruleA :: Word16x4 -> Int -> ByteString -> Word16x4
-ruleA (w1, w2, w3, w4) counter key = (gw1 `xor` w4 `xor` (fromIntegral counter), gw1, w2, w3)
+ruleA :: ByteString -> Word16x4 -> Int -> Word16x4
+ruleA key (w1, w2, w3, w4) counter = (gw1 `xor` w4 `xor` (fromIntegral counter), gw1, w2, w3)
   where gw1 = g w1 counter key
 
-ruleB :: Word16x4 -> Int -> ByteString -> Word16x4
-ruleB (w1, w2, w3, w4) counter key = (w4, g w1 counter key, w1 `xor` w2 `xor` (fromIntegral counter), w3)
+ruleB :: ByteString -> Word16x4 -> Int -> Word16x4
+ruleB key (w1, w2, w3, w4) counter = (w4, g w1 counter key, w1 `xor` w2 `xor` (fromIntegral counter), w3)
 
-ruleAminus1 :: Word16x4 -> Int -> ByteString -> Word16x4
-ruleAminus1 (w1, w2, w3, w4) counter key = (gR w2 counter key, w3, w4, w1 `xor` w2 `xor` (fromIntegral counter))
+ruleAminus1 :: ByteString -> Word16x4 -> Int -> Word16x4
+ruleAminus1 key (w1, w2, w3, w4) counter = (gMinus1 w2 counter key, w3, w4, w1 `xor` w2 `xor` (fromIntegral counter))
 
-ruleBMinus1 :: Word16x4 -> Int -> ByteString -> Word16x4
-ruleBMinus1 (w1, w2, w3, w4) counter key = (gRw2, gRw2 `xor` w3 `xor` (fromIntegral counter), w4, w1)
-  where gRw2 = gR w2 counter key
+ruleBMinus1 :: ByteString -> Word16x4 -> Int -> Word16x4
+ruleBMinus1 key (w1, w2, w3, w4) counter = (gRw2, gRw2 `xor` w3 `xor` (fromIntegral counter), w4, w1)
+  where gRw2 = gMinus1 w2 counter key
+
+cv :: ByteString -> Int -> Int -> Word8
+cv key k i = index key $ (4 * k + i) `mod` 10
 
 g :: Word16 -> Int -> ByteString -> Word16
 g w k key = combineTwoWord8 $ foldl (foldFunc k) (splitWord16 w) [0..3]
-  where foldFunc k (g1:g2:[]) i = [g2, (fTable ! (fromIntegral $ g2 `xor` (index key $ (4 * k + i) `mod` 10))) `xor` g1]
+  where foldFunc k (g1:g2:[]) i = [g2, (fTable ! (fromIntegral $ g2 `xor` cv key k i)) `xor` g1]
 
-gR :: Word16 -> Int -> ByteString -> Word16
-gR w k key = combineTwoWord8 $ foldr (foldFunc k) (splitWord16 w) [0..3]
-  where foldFunc k i (g5:g6:[]) = [(fTable ! (fromIntegral $ g5 `xor` (index key $ (4 * k + i) `mod` 10))) `xor` g6, g5]
+gMinus1 :: Word16 -> Int -> ByteString -> Word16
+gMinus1 w k key = combineTwoWord8 $ foldr (foldFunc k) (splitWord16 w) [0..3]
+  where foldFunc k i (g5:g6:[]) = [(fTable ! (fromIntegral $ g5 `xor` cv key k i)) `xor` g6, g5]
 
 shouldRuleA :: Int -> Bool
 shouldRuleA k = k <= 8 || 17 <= k && k <= 24
 
 encrypt :: Word16x4 -> ByteString -> Word16x4
-encrypt w key = foldl foldFunc w [1,2..32]
+encrypt w key = foldl foldFunc w [1..32]
   where foldFunc w k
-          | shouldRuleA k = ruleA w k key
-          | otherwise = ruleB w k key
+          | shouldRuleA k = ruleA key w k
+          | otherwise = ruleB key w k
 
 decrypt :: Word16x4 -> ByteString -> Word16x4
-decrypt w key = foldl foldFunc w [32,31..1]
-  where foldFunc w k
-          | shouldRuleA k = ruleAminus1 w k key
-          | otherwise = ruleBMinus1 w k key
+decrypt w key = foldr foldFunc w [1..32]
+  where foldFunc k w
+          | shouldRuleA k = ruleAminus1 key w k
+          | otherwise = ruleBMinus1 key w k
 
 main :: IO ()
 main = do
