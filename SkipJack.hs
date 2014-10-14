@@ -1,6 +1,7 @@
 module SkipJack where
 
 import Data.Bits
+import Data.Char
 import Data.ByteString (ByteString, index, pack)
 import Data.Word
 import Data.Vector (Vector, (!), fromList)
@@ -76,3 +77,27 @@ finishString :: String -> String
 finishString s
   | (length s) `mod` 8 == 0 = s
   | otherwise = finishString $ s ++ "0"
+
+flatten :: Word16x4 -> [Word16]
+flatten (w1, w2, w3, w4) = [w1, w2, w3, w4]
+
+nest :: [Word16] -> Word16x4
+nest (w1:w2:w3:w4:[]) = (w1, w2, w3, w4)
+
+foldWords :: String -> Word16 -> String
+foldWords cipherText elem = cipherText ++ (show a0) ++ (show a1)
+  where (a0:a1:[]) = splitWord16 elem
+
+foldRange :: ByteString -> String -> String -> Int -> String
+foldRange key finished text i = foldl foldWords text (flatten $ encryptBlock key w)
+  where w = nest $ map mapFunc [0,2..6]
+        mapFunc j = combineTwoWord8 [nth $ i * 8 + j, nth $ i * 8 + j + 1]
+        nth n = fromIntegral . ord $ finished !! n
+        
+encrypt :: ByteString -> String -> String
+encrypt key s = foldl (foldRange key finished) "" [0..length finished]
+  where finished = finishString s
+
+decrypt :: ByteString -> String -> String
+decrypt key s = undefined
+
