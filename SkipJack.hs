@@ -60,14 +60,19 @@ gMinus1 w k key = combineTwoWord8 $ foldr (foldFunc k) (splitWord16 w) [0..3]
 shouldRuleA :: Int -> Bool
 shouldRuleA k = k <= 8 || 17 <= k && k <= 24
 
-encrypt :: ByteString -> Word16x4 -> Word16x4
-encrypt key w = foldl foldFunc w [1..32]
+encryptBlock :: ByteString -> Word16x4 -> Word16x4
+encryptBlock key w = foldl foldFunc w [1..32]
   where foldFunc w k
           | shouldRuleA k = ruleA key w k
           | otherwise = ruleB key w k
 
-decrypt :: ByteString -> Word16x4 -> Word16x4
-decrypt key w = foldr foldFunc w [1..32]
+decryptBlock :: ByteString -> Word16x4 -> Word16x4
+decryptBlock key w = foldr foldFunc w [1..32]
   where foldFunc k w
           | shouldRuleA k = ruleAminus1 key w k
           | otherwise = ruleBMinus1 key w k
+
+finishString :: String -> String
+finishString s
+  | (length s) `mod` 8 == 0 = s
+  | otherwise = finishString $ s ++ "0"

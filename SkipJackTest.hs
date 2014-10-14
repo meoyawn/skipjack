@@ -2,20 +2,25 @@ module Main where
 
 import SkipJack
 import Control.Applicative
-import Data.ByteString
+import Data.ByteString hiding (length)
 import Data.Word
 import Test.QuickCheck
 
-wordSplitting :: Word16 -> Bool
-wordSplitting w = w == combineTwoWord8 (splitWord16 w)
+prop_wordSplitting :: Word16 -> Bool
+prop_wordSplitting w = w == combineTwoWord8 (splitWord16 w)
 
 instance Arbitrary ByteString where
     arbitrary = pack <$> vector 10
 
-decrypting :: ByteString -> Word16x4 -> Bool
-decrypting key w = w == decrypt key (encrypt key w)
+prop_blockDecryption :: ByteString -> Word16x4 -> Bool
+prop_blockDecryption key w = w == decryptBlock key (encryptBlock key w)
 
-main :: IO ()
+prop_stringFinishing :: String -> Bool
+prop_stringFinishing s = (length $ finishString s) `mod` 8 == 0
+
+return []
+runTests = $quickCheckAll
+
 main = do
-    quickCheck wordSplitting
-    quickCheck decrypting
+    runTests
+    return ()
