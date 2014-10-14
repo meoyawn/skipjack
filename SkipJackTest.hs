@@ -29,6 +29,9 @@ instance Arbitrary Words where
 prop_nesting :: Words -> Bool
 prop_nesting (Words ws) = ws == (flatten $ nest ws)
 
+prop_decryption :: ByteString -> String -> Bool
+prop_decryption key s = s == decrypt key (encrypt key s)
+
 return []
 runTests = $quickCheckAll
 

@@ -88,16 +88,19 @@ foldWords :: String -> Word16 -> String
 foldWords cipherText elem = cipherText ++ (show a0) ++ (show a1)
   where (a0:a1:[]) = splitWord16 elem
 
-foldRange :: ByteString -> String -> String -> Int -> String
-foldRange key finished text i = foldl foldWords text (flatten $ encryptBlock key w)
-  where w = nest $ map mapFunc [0,2..6]
-        mapFunc j = combineTwoWord8 [nth $ i * 8 + j, nth $ i * 8 + j + 1]
-        nth n = fromIntegral . ord $ finished !! n
+foldRange :: ByteString -> String -> (ByteString -> Word16x4 -> Word16x4) -> String -> Int -> String
+foldRange key s func text i = foldl foldWords text (flatten $ func key w)
+  where w = nest $ map mapFunc [0,2,4,6]
+        mapFunc j = combineTwoWord8 [nth $ (i * 8) + j, nth $ (i * 8) + j + 1]
+        nth n = fromIntegral . ord $ s !! n
+
+lenDiv8Minus1 :: String -> Int
+lenDiv8Minus1 s = (length s `div` 8) - 1
         
 encrypt :: ByteString -> String -> String
-encrypt key s = foldl (foldRange key finished) "" [0..length finished]
-  where finished = finishString s
+encrypt key raw = foldl (foldRange key s encryptBlock) [] [0..(lenDiv8Minus1 s)]
+  where s = finishString raw
 
 decrypt :: ByteString -> String -> String
-decrypt key s = undefined
+decrypt key s = foldl (foldRange key s decryptBlock) [] [0..(lenDiv8Minus1 s)]
 
