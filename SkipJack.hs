@@ -2,9 +2,10 @@ module SkipJack where
 
 import Data.Bits
 import Data.Char
-import Data.ByteString (ByteString, index, pack)
+import Data.ByteString (ByteString, index)
 import Data.Word
 import Data.Vector (Vector, (!), fromList)
+import Codec.Binary.UTF8.String
 
 type Word16x4 = (Word16, Word16, Word16, Word16)
 
@@ -31,41 +32,41 @@ splitWord16 x = map fromIntegral [ x .&. 0xFF, (x .&. 0xFF00) `shiftR` 8 ]
 
 combineTwoWord8 :: [Word8] -> Word16
 combineTwoWord8 xs = (y `shiftL` 8) .|. x
-  where (x:y:[]) = map fromIntegral xs
+  where [x,y] = map fromIntegral xs
 
 ruleA :: ByteString -> Word16x4 -> Int -> Word16x4
-ruleA key (w1, w2, w3, w4) counter = (gw1 `xor` w4 `xor` (fromIntegral counter), gw1, w2, w3)
+ruleA key (w1,w2,w3,w4) counter = (gw1 `xor` w4 `xor` fromIntegral counter, gw1, w2, w3)
   where gw1 = g w1 counter key
 
 ruleB :: ByteString -> Word16x4 -> Int -> Word16x4
-ruleB key (w1, w2, w3, w4) counter = (w4, g w1 counter key, w1 `xor` w2 `xor` (fromIntegral counter), w3)
+ruleB key (w1,w2,w3,w4) counter = (w4, g w1 counter key, w1 `xor` w2 `xor` fromIntegral counter, w3)
 
 ruleAminus1 :: ByteString -> Word16x4 -> Int -> Word16x4
-ruleAminus1 key (w1, w2, w3, w4) counter = (gMinus1 w2 counter key, w3, w4, w1 `xor` w2 `xor` (fromIntegral counter))
+ruleAminus1 key (w1,w2,w3,w4) counter = (gMinus1 w2 counter key, w3, w4, w1 `xor` w2 `xor` fromIntegral counter)
 
 ruleBMinus1 :: ByteString -> Word16x4 -> Int -> Word16x4
-ruleBMinus1 key (w1, w2, w3, w4) counter = (gRw2, gRw2 `xor` w3 `xor` (fromIntegral counter), w4, w1)
+ruleBMinus1 key (w1,w2,w3,w4) counter = (gRw2, gRw2 `xor` w3 `xor` fromIntegral counter, w4, w1)
   where gRw2 = gMinus1 w2 counter key
 
 cv :: ByteString -> Int -> Int -> Word8
 cv key k i = index key $ (4 * k + i) `mod` 10
 
 g :: Word16 -> Int -> ByteString -> Word16
-g w k key = combineTwoWord8 $ foldl (foldFunc k) (splitWord16 w) [0..3]
-  where foldFunc k (g1:g2:[]) i = [g2, (fTable ! (fromIntegral $ g2 `xor` cv key k i)) `xor` g1]
+g w k key = combineTwoWord8 $ foldl foldFunc (splitWord16 w) [0..3]
+  where foldFunc [g1,g2] i = [g2, (fTable ! fromIntegral (g2 `xor` cv key k i)) `xor` g1]
 
 gMinus1 :: Word16 -> Int -> ByteString -> Word16
-gMinus1 w k key = combineTwoWord8 $ foldr (foldFunc k) (splitWord16 w) [0..3]
-  where foldFunc k i (g5:g6:[]) = [(fTable ! (fromIntegral $ g5 `xor` cv key k i)) `xor` g6, g5]
+gMinus1 w k key = combineTwoWord8 $ foldr foldFunc (splitWord16 w) [0..3]
+  where foldFunc i [g5, g6] = [(fTable ! fromIntegral (g5 `xor` cv key k i)) `xor` g6, g5]
 
 shouldRuleA :: Int -> Bool
 shouldRuleA k = k <= 8 || 17 <= k && k <= 24
 
 encryptBlock :: ByteString -> Word16x4 -> Word16x4
-encryptBlock key w = foldl foldFunc w [1..32]
-  where foldFunc w k
-          | shouldRuleA k = ruleA key w k
-          | otherwise = ruleB key w k
+encryptBlock key wrds = foldl foldFunc wrds [1..32]
+  where foldFunc word k
+          | shouldRuleA k = ruleA key word k
+          | otherwise = ruleB key word k
 
 decryptBlock :: ByteString -> Word16x4 -> Word16x4
 decryptBlock key w = foldr foldFunc w [1..32]
@@ -73,34 +74,36 @@ decryptBlock key w = foldr foldFunc w [1..32]
           | shouldRuleA k = ruleAminus1 key w k
           | otherwise = ruleBMinus1 key w k
 
-finishString :: String -> String
-finishString s
-  | (length s) `mod` 8 == 0 = s
-  | otherwise = finishString $ s ++ "0"
-
-flatten :: Word16x4 -> [Word16]
-flatten (w1, w2, w3, w4) = [w1, w2, w3, w4]
-
-nest :: [Word16] -> Word16x4
-nest (w1:w2:w3:w4:[]) = (w1, w2, w3, w4)
-
-foldWords :: String -> Word16 -> String
-foldWords cipherText elem = cipherText ++ (show a0) ++ (show a1)
-  where (a0:a1:[]) = splitWord16 elem
-
-foldRange :: ByteString -> String -> (ByteString -> Word16x4 -> Word16x4) -> String -> Int -> String
-foldRange key s func text i = foldl foldWords text (flatten $ func key w)
-  where w = nest $ map mapFunc [0,2,4,6]
-        mapFunc j = combineTwoWord8 [nth $ (i * 8) + j, nth $ (i * 8) + j + 1]
-        nth n = fromIntegral . ord $ s !! n
-
-lenDiv8Minus1 :: String -> Int
-lenDiv8Minus1 s = (length s `div` 8) - 1
-        
 encrypt :: ByteString -> String -> String
-encrypt key raw = foldl (foldRange key s encryptBlock) [] [0..(lenDiv8Minus1 s)]
-  where s = finishString raw
+encrypt key raw = undefined
 
 decrypt :: ByteString -> String -> String
-decrypt key s = foldl (foldRange key s decryptBlock) [] [0..(lenDiv8Minus1 s)]
+decrypt key s = undefined
+
+-- hash! 8 22 2
+
+charToByte :: Char -> Word8
+charToByte = fromIntegral . ord
+
+byteToChar :: Word8 -> Char
+byteToChar = chr . fromIntegral
+
+words8To16 :: [Word8] -> [Word16]
+words8To16 (w1:w2:rest) = combineTwoWord8 [w1, w2] : words8To16 rest
+words8To16 [] = []
+words8To16 _ = error "uneven number of word8s"
+
+words16ToBlocks :: [Word16] -> [Word16x4]
+words16ToBlocks (w1:w2:w3:w4:rest) = (w1,w2,w3,w4) : words16ToBlocks rest
+words16ToBlocks [] = []
+words16ToBlocks _ = error "uneven number of word16s"
+
+blocksToWords16 :: [Word16x4] -> [Word16]
+blocksToWords16 = foldl f []
+  where f ws (w1,w2,w3,w4) = ws ++ [w1,w2,w3,w4]
+
+words16To8 :: [Word16] -> [Word8]
+words16To8 ws = ws >>= splitWord16
+
+
 
