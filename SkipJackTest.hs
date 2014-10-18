@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 module Main where
 
 import SkipJack
@@ -31,8 +33,11 @@ prop_decryption :: ByteString -> String -> Bool
 prop_decryption key s = s == decrypt key (encrypt key s)
 
 return []
+
+runTests :: IO Bool
 runTests = $quickCheckAll
 
+main :: IO ()
 main = do
-    runTests
+    _ <- runTests
     return ()
