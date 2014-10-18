@@ -5,7 +5,6 @@ import Data.Char
 import Data.ByteString (ByteString, index)
 import Data.Word
 import Data.Vector (Vector, (!), fromList)
-import Codec.Binary.UTF8.String
 
 type Word16x4 = (Word16, Word16, Word16, Word16)
 
@@ -54,10 +53,12 @@ cv key k i = index key $ (4 * k + i) `mod` 10
 g :: Word16 -> Int -> ByteString -> Word16
 g w k key = combineTwoWord8 $ foldl foldFunc (splitWord16 w) [0..3]
   where foldFunc [g1,g2] i = [g2, (fTable ! fromIntegral (g2 `xor` cv key k i)) `xor` g1]
+        foldFunc  _      _ = error "should have exactly two items in a list"
 
 gMinus1 :: Word16 -> Int -> ByteString -> Word16
 gMinus1 w k key = combineTwoWord8 $ foldr foldFunc (splitWord16 w) [0..3]
   where foldFunc i [g5, g6] = [(fTable ! fromIntegral (g5 `xor` cv key k i)) `xor` g6, g5]
+        foldFunc _  _       = error "should have exactly two items in a list"
 
 shouldRuleA :: Int -> Bool
 shouldRuleA k = k <= 8 || 17 <= k && k <= 24
@@ -70,15 +71,15 @@ encryptBlock key wrds = foldl foldFunc wrds [1..32]
 
 decryptBlock :: ByteString -> Word16x4 -> Word16x4
 decryptBlock key w = foldr foldFunc w [1..32]
-  where foldFunc k w
-          | shouldRuleA k = ruleAminus1 key w k
-          | otherwise = ruleBMinus1 key w k
+  where foldFunc k word
+          | shouldRuleA k = ruleAminus1 key word k
+          | otherwise = ruleBMinus1 key word k
 
 encrypt :: ByteString -> String -> String
-encrypt key raw = undefined
+encrypt key s = blocksToStringRaw $ map (encryptBlock key) (stringToBlocks s) 
 
 decrypt :: ByteString -> String -> String
-decrypt key s = undefined
+decrypt key s = blocksToString $ map (decryptBlock key) (stringToBlocksRaw s)
 
 -- hash! 8 22 2
 
@@ -87,6 +88,28 @@ charToByte = fromIntegral . ord
 
 byteToChar :: Word8 -> Char
 byteToChar = chr . fromIntegral
+
+stringToBytes :: String -> [Word8]
+stringToBytes = map charToByte
+
+bytesToString :: [Word8] -> String
+bytesToString = map byteToChar
+
+prepare :: String -> String
+prepare s
+  | m == 0 = s ++ "1" ++ replicate 7 '0'
+  | m == 7 = s ++ "1" ++ replicate 8 '0'
+  | otherwise = s ++ "1" ++ replicate (7 - m) '0'
+  where m = length s `mod` 8
+
+unprepare :: String -> String
+unprepare [] = error "prepare your string first"
+unprepare s
+  | l == '0' = unprepare i
+  | l == '1' = i
+  | otherwise = error "not properly prepared"
+  where l = last s
+        i = init s
 
 words8To16 :: [Word8] -> [Word16]
 words8To16 (w1:w2:rest) = combineTwoWord8 [w1, w2] : words8To16 rest
@@ -105,5 +128,14 @@ blocksToWords16 = foldl f []
 words16To8 :: [Word16] -> [Word8]
 words16To8 ws = ws >>= splitWord16
 
+stringToBlocks :: String -> [Word16x4]
+stringToBlocks = stringToBlocksRaw . prepare
 
+stringToBlocksRaw :: String -> [Word16x4]
+stringToBlocksRaw = words16ToBlocks . words8To16 . stringToBytes
 
+blocksToString :: [Word16x4] -> String
+blocksToString = unprepare . blocksToStringRaw
+
+blocksToStringRaw :: [Word16x4] -> String
+blocksToStringRaw = bytesToString . words16To8 . blocksToWords16
