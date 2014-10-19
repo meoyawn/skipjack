@@ -26,11 +26,11 @@ decryptCBC key cs = foldl f [] $ withPrev c0 cs
 
 encrypt :: ByteString -> String -> String
 encrypt _   [] = []
-encrypt key s  = blocksToStringRaw $ map (encryptBlock key) (stringToBlocks s) 
+encrypt key s  = blocksToStringRaw $ encryptCBC key $ stringToBlocks s
 
 decrypt :: ByteString -> String -> String
 decrypt _   [] = []
-decrypt key s  = blocksToString $ map (decryptBlock key) (stringToBlocksRaw s)
+decrypt key s  = blocksToString $ decryptCBC key $ stringToBlocksRaw s
 
 -- hash! 8 22 2
 
