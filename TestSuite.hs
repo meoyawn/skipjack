@@ -1,11 +1,11 @@
 module Main where
 
 import SkipJackTest
-import DaviesMeyerTest
+import HashTest
 import CBCTest
 
 main :: IO ()
 main = do
     SkipJackTest.test
-    DaviesMeyerTest.test
+    HashTest.test
     CBCTest.test

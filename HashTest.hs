@@ -1,7 +1,7 @@
 module HashTest where
 
 import SkipJack
-import DaviesMeyer
+import Hash
 import Data.ByteString (length)
 import Test.QuickCheck
 
