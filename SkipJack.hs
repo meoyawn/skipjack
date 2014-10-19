@@ -1,7 +1,6 @@
 module SkipJack where
 
 import Data.Bits
-import Data.Char
 import Data.ByteString (ByteString, index)
 import Data.Word
 import Data.Vector (Vector, (!), fromList)
@@ -75,69 +74,3 @@ decryptBlock key w = foldr foldFunc w [1..32]
           | shouldRuleA k = ruleAminus1 key word k
           | otherwise = ruleBMinus1 key word k
 
-encrypt :: ByteString -> String -> String
-encrypt _   [] = []
-encrypt key s  = blocksToStringRaw $ map (encryptBlock key) (stringToBlocks s) 
-
-decrypt :: ByteString -> String -> String
-decrypt _   [] = []
-decrypt key s  = blocksToString $ map (decryptBlock key) (stringToBlocksRaw s)
-
--- hash! 8 22 2
-
-charToByte :: Char -> Word8
-charToByte = fromIntegral . ord
-
-byteToChar :: Word8 -> Char
-byteToChar = chr . fromIntegral
-
-stringToBytes :: String -> [Word8]
-stringToBytes = map charToByte
-
-bytesToString :: [Word8] -> String
-bytesToString = map byteToChar
-
-prepare :: String -> String
-prepare s
-  | m == 0 = s ++ "1" ++ replicate 7 '0'
-  | m == 7 = s ++ "1" ++ replicate 8 '0'
-  | otherwise = s ++ "1" ++ replicate (7 - m) '0'
-  where m = length s `mod` 8
-
-unprepare :: String -> String
-unprepare [] = error "prepare your string first"
-unprepare s
-  | l == '0' = unprepare i
-  | l == '1' = i
-  | otherwise = error "not properly prepared"
-  where l = last s
-        i = init s
-
-words8To16 :: [Word8] -> [Word16]
-words8To16 (w1:w2:rest) = combineTwoWord8 [w1, w2] : words8To16 rest
-words8To16 [] = []
-words8To16 _ = error "uneven number of word8s"
-
-words16ToBlocks :: [Word16] -> [Word16x4]
-words16ToBlocks (w1:w2:w3:w4:rest) = (w1,w2,w3,w4) : words16ToBlocks rest
-words16ToBlocks [] = []
-words16ToBlocks _ = error "uneven number of word16s"
-
-blocksToWords16 :: [Word16x4] -> [Word16]
-blocksToWords16 = foldl f []
-  where f ws (w1,w2,w3,w4) = ws ++ [w1,w2,w3,w4]
-
-words16To8 :: [Word16] -> [Word8]
-words16To8 ws = ws >>= splitWord16
-
-stringToBlocks :: String -> [Word16x4]
-stringToBlocks = stringToBlocksRaw . prepare
-
-stringToBlocksRaw :: String -> [Word16x4]
-stringToBlocksRaw = words16ToBlocks . words8To16 . stringToBytes
-
-blocksToString :: [Word16x4] -> String
-blocksToString = unprepare . blocksToStringRaw
-
-blocksToStringRaw :: [Word16x4] -> String
-blocksToStringRaw = bytesToString . words16To8 . blocksToWords16

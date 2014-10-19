@@ -1,5 +1,6 @@
 module DaviesMeyer where
 
+import CBC
 import SkipJack
 import Data.Bits (xor)
 import Data.ByteString (ByteString, pack)
