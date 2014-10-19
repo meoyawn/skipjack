@@ -37,5 +37,14 @@ encryptFold h mi = xorW16x4 e h
 h0 :: Word16x4
 h0 = (3123, 6778, 5679, 6788)
 
-daviesMeyer :: String -> Word16x4
-daviesMeyer s = foldl encryptFold h0 (keys s)
+asInteger :: Word16x4 -> Integer
+asInteger (w1, w2, w3, w4) = (fromIntegral w1) * 1000000000000000 + (fromIntegral w2) * 10000000000 + (fromIntegral w3) * 100000 + (fromIntegral w4)
+
+hash64 :: String -> Integer
+hash64 s = asInteger $ foldl encryptFold h0 (keys s)
+
+hash :: String -> Integer
+hash s = read (show h1 ++ show h2)
+    where h1 = hash64 s
+          h2 = hash64 (show h1 ++ s)
+
