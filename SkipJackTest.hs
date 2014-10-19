@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Main where
+module SkipJackTest where
 
 import SkipJack
 import Control.Applicative
@@ -37,7 +37,7 @@ return []
 runTests :: IO Bool
 runTests = $quickCheckAll
 
-main :: IO ()
-main = do
+test :: IO ()
+test = do
     _ <- runTests
     return ()

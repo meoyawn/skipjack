@@ -76,10 +76,12 @@ decryptBlock key w = foldr foldFunc w [1..32]
           | otherwise = ruleBMinus1 key word k
 
 encrypt :: ByteString -> String -> String
-encrypt key s = blocksToStringRaw $ map (encryptBlock key) (stringToBlocks s) 
+encrypt _   [] = []
+encrypt key s  = blocksToStringRaw $ map (encryptBlock key) (stringToBlocks s) 
 
 decrypt :: ByteString -> String -> String
-decrypt key s = blocksToString $ map (decryptBlock key) (stringToBlocksRaw s)
+decrypt _   [] = []
+decrypt key s  = blocksToString $ map (decryptBlock key) (stringToBlocksRaw s)
 
 -- hash! 8 22 2
 

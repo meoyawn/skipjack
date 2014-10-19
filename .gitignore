@@ -1,5 +1,4 @@
-SkipJack
-SkipJackTest
+TestSuite
 *.hi
 *.o
 *.dyn_hi
