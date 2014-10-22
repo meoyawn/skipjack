@@ -2,23 +2,52 @@
 </head>
 
 <body>
-    <h1>Зашифрование</h1>
+    <h1>Skipjack</h1>
     <h2>Режим: Cipher Block Chaining</h2>
     <div>
         <span>Ключ:</span>
-        <input type="text">
+        <input type="text" maxlength="5">
     </div>
     <div>
         <span>Исходное:</span>
+        <br>
         <textarea></textarea>
         <button>Зашифровать</button>
     </div>
     <div>
-        <span>Зашифрованное</span>
+        <span>Зашифрованное:</span>
+        <br>
         <textarea></textarea>
         <button>Расшифровать</button>
     </div>
     <div>
+        <span>Расшифрованное:</span>
+        <br>
+        <textarea disabled></textarea>
+    </div>
+    <h1>Хеш</h1>
+    <div>
+        <span>Сообщение:</span>
         <textarea></textarea>
+        <button>Вычислить</button>
+    </div>
+    <h1>Цифровая подпись</h1>
+    <div>
+        <span>Ключ:</span>
+        <input type="number" disabled>
+        <button>Сгенерировать</button>
+    </div>
+    <div>
+        <span>Сообщение:</span>
+        <textarea></textarea>
+        <button>Вычислить</button>
+    </div>
+    <div>
+        <span>R:</span>
+        <input type="number" disabled>
+    </div>
+    <div>
+        <span>S:</span>
+        <input type="number" disabled>
     </div>
 </body>
