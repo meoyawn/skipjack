@@ -4,4 +4,4 @@ App
 *.o
 *.dyn*
 main/
-*.js
+app.js
