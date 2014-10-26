@@ -58,7 +58,13 @@ genSigKey _ _ = withElems ["signature-key"] $ \[key] -> do
   x <- show <$> generateX
   setProp key "value" x
 
-calcSig _ _ = undefined
+calcSig _ _ = withElems ["signature-key", "signature-message", "r", "s"] $ \[key, msg, rElem, sElem] -> do
+  Just m <- getValue msg
+  k <- generateK
+  Just x <- getValue key
+  (r, s) <- return $ signature (hash m) k (read x)
+  setProp rElem "value" $ show r
+  setProp sElem "value" $ show s
 
 events [encryptBtn, decryptBtn, hashBtn, signatureKey, signatureCalc] = do
     onEvent encryptBtn OnClick doEncrypt
@@ -72,4 +78,5 @@ main = withElems ["encrypt",
                   "decrypt",
                   "calculate-hash",
                   "generate-signature-key",
-                  "calculate_signature"] events
+                  "calculate-signature"] events
+
