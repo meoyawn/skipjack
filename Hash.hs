@@ -10,12 +10,13 @@ stringToByteString = pack . stringToBytes
 prepareForKeys :: String -> String
 prepareForKeys s
     | m == 0 = s
-    | otherwise = s ++ replicate (10 - m) '0'
-    where m = Prelude.length s `mod` 10
+    | otherwise = s ++ replicate (5 - m) '\0'
+    where m = l `mod` 5
+          l = Prelude.length s
 
 keysImpl :: String -> [ByteString]
 keysImpl [] = []
-keysImpl s  = stringToByteString (take 10 s) : keysImpl (drop 10 s)
+keysImpl s  = stringToByteString (take 5 s) : keysImpl (drop 5 s)
 
 keys :: String -> [ByteString]
 keys = keysImpl . prepareForKeys

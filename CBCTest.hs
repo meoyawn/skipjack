@@ -12,10 +12,10 @@ instance Arbitrary ByteString where
     arbitrary = pack <$> vector 10
 
 prop_byteToChar :: Char -> Bool
-prop_byteToChar c = c == byteToChar (charToByte c)
+prop_byteToChar c = c == word16ToChar (charToWord16 c)
 
 prop_preparing :: String -> Bool
-prop_preparing s = length (prepare s) `mod` 8 == 0
+prop_preparing s = length (prepare s) `mod` 4 == 0
 
 prop_unpreparing :: String -> Bool
 prop_unpreparing s = s == unprepare (prepare s)

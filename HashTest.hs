@@ -6,7 +6,7 @@ import Data.ByteString (length)
 import Test.QuickCheck
 
 prop_keyPreparing :: String -> Bool
-prop_keyPreparing s = Prelude.length (prepareForKeys s) `mod` 10 == 0
+prop_keyPreparing s = Prelude.length (prepareForKeys s) `mod` 5 == 0
 
 prop_keys :: String -> Bool
 prop_keys s = all f (keys s)

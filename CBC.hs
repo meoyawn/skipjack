@@ -34,24 +34,12 @@ decrypt key s  = blocksToString $ decryptCBC key $ stringToBlocksRaw s
 
 -- hash! 8 22 2
 
-charToByte :: Char -> Word8
-charToByte = fromIntegral . ord
-
-byteToChar :: Word8 -> Char
-byteToChar = chr . fromIntegral
-
-stringToBytes :: String -> [Word8]
-stringToBytes = map charToByte
-
-bytesToString :: [Word8] -> String
-bytesToString = map byteToChar
-
 prepare :: String -> String
 prepare s
-  | m == 0 = s ++ "1" ++ replicate 7 '0'
-  | m == 7 = s ++ "1" ++ replicate 8 '0'
-  | otherwise = s ++ "1" ++ replicate (7 - m) '0'
-  where m = length s `mod` 8
+  | m == 0 = s ++ "1" ++ replicate 3 '0'
+  | m == 3 = s ++ "1" ++ replicate 4 '0'
+  | otherwise = s ++ "1" ++ replicate (3 - m) '0'
+  where m = length s `mod` 4
 
 unprepare :: String -> String
 unprepare [] = error "prepare your string first"
@@ -82,11 +70,28 @@ words16To8 ws = ws >>= splitWord16
 stringToBlocks :: String -> [Word16x4]
 stringToBlocks = stringToBlocksRaw . prepare
 
+charToWord16 :: Char -> Word16
+charToWord16 = fromIntegral . ord
+
+word16ToChar :: Word16 -> Char
+word16ToChar = chr . fromIntegral
+
+stringToBytes :: String -> [Word8]
+stringToBytes s = foldl f [] $ stringToWords16 s
+  where f w8s w16 = w8s ++ splitWord16 w16
+
+stringToWords16 :: String -> [Word16]
+stringToWords16 = map charToWord16
+
+bytesToString :: [Word16] -> String
+bytesToString = map word16ToChar
+
 stringToBlocksRaw :: String -> [Word16x4]
-stringToBlocksRaw = words16ToBlocks . words8To16 . stringToBytes
+stringToBlocksRaw = words16ToBlocks . stringToWords16
 
 blocksToString :: [Word16x4] -> String
 blocksToString = unprepare . blocksToStringRaw
 
 blocksToStringRaw :: [Word16x4] -> String
-blocksToStringRaw = bytesToString . words16To8 . blocksToWords16
+blocksToStringRaw = bytesToString . blocksToWords16
+
