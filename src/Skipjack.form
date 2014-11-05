@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="Skipjack">
-  <grid id="27dc6" binding="root" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="root" layout-manager="GridLayoutManager" row-count="15" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="500" height="400"/>
+      <xy x="20" y="20" width="500" height="572"/>
     </constraints>
     <properties/>
     <border type="empty">
@@ -18,7 +18,7 @@
           <text value="Ключ"/>
         </properties>
       </component>
-      <component id="78f87" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+      <component id="78f87" class="javax.swing.JTextField" binding="keyField" default-binding="true">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
@@ -34,7 +34,7 @@
           <text value="Зашифрованное"/>
         </properties>
       </component>
-      <component id="f4d2f" class="javax.swing.JTextArea" binding="textArea1" default-binding="true">
+      <component id="f4d2f" class="javax.swing.JTextArea" binding="initialText" default-binding="true">
         <constraints>
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="2" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
@@ -50,7 +50,7 @@
           <text value="Исходное"/>
         </properties>
       </component>
-      <component id="1468c" class="javax.swing.JTextArea" binding="textArea2" default-binding="true">
+      <component id="1468c" class="javax.swing.JTextArea" binding="encryptedText" default-binding="true">
         <constraints>
           <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="2" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
@@ -66,7 +66,7 @@
           <text value="Расшифрованное"/>
         </properties>
       </component>
-      <component id="aff8" class="javax.swing.JTextArea" binding="textArea3" default-binding="true">
+      <component id="aff8" class="javax.swing.JTextArea" binding="decryptedText" default-binding="true">
         <constraints>
           <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="2" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
@@ -88,7 +88,7 @@
         </constraints>
         <properties/>
       </component>
-      <component id="a3f0c" class="javax.swing.JButton" binding="зашифроватьButton" default-binding="true">
+      <component id="a3f0c" class="javax.swing.JButton" binding="encryptButton" default-binding="true">
         <constraints>
           <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -96,13 +96,173 @@
           <text value="Зашифровать"/>
         </properties>
       </component>
-      <component id="5afc4" class="javax.swing.JButton" binding="расшифроватьButton" default-binding="true">
+      <component id="5afc4" class="javax.swing.JButton" binding="decryptButton" default-binding="true">
         <constraints>
           <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Расшифровать"/>
         </properties>
+      </component>
+      <component id="24c48" class="javax.swing.JLabel" binding="keyError">
+        <constraints>
+          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="2" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <foreground color="-65536"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="2ff5e" class="javax.swing.JLabel" binding="decryptError">
+        <constraints>
+          <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="2" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <foreground color="-65536"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="32144" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Хеширование"/>
+        </properties>
+      </component>
+      <component id="4fe8" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Сообщение"/>
+        </properties>
+      </component>
+      <component id="ac687" class="javax.swing.JTextArea" binding="hashMsg" default-binding="true">
+        <constraints>
+          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="2" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="50"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="e2e29" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Хеш"/>
+        </properties>
+      </component>
+      <component id="eaf3" class="javax.swing.JTextField" binding="hash" default-binding="true">
+        <constraints>
+          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="d3d3c" class="javax.swing.JButton" binding="hashButton" default-binding="true">
+        <constraints>
+          <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Вычислить"/>
+        </properties>
+      </component>
+      <component id="8822e" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Подпись"/>
+        </properties>
+      </component>
+      <component id="c86f6" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Ключ"/>
+        </properties>
+      </component>
+      <component id="3ff01" class="javax.swing.JTextField" binding="sigKey" default-binding="true">
+        <constraints>
+          <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="1e2d" class="javax.swing.JButton" binding="generateKeyButton" default-binding="true">
+        <constraints>
+          <grid row="11" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Сгенирировать"/>
+        </properties>
+      </component>
+      <component id="270f3" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Сообщение"/>
+        </properties>
+      </component>
+      <component id="1967d" class="javax.swing.JTextArea" binding="textArea1" default-binding="true">
+        <constraints>
+          <grid row="12" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="50"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="406b6" class="javax.swing.JButton" binding="вычислитьButton" default-binding="true">
+        <constraints>
+          <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Вычислить"/>
+        </properties>
+      </component>
+      <component id="b7c2c" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="R"/>
+        </properties>
+      </component>
+      <component id="f5b41" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="S"/>
+        </properties>
+      </component>
+      <component id="e98f2" class="javax.swing.JTextField" binding="textField2" default-binding="true">
+        <constraints>
+          <grid row="13" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="3ecb" class="javax.swing.JTextField" binding="textField3" default-binding="true">
+        <constraints>
+          <grid row="14" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="5dccf" class="javax.swing.JSeparator">
+        <constraints>
+          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
       </component>
     </children>
   </grid>

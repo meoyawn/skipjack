@@ -5,3 +5,10 @@ App
 *.dyn*
 main/
 app.js
+.idea/
+*.iml
+out/
+Decryptor
+Encryptor
+Hasher
+XGenerator
