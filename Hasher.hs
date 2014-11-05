@@ -5,6 +5,7 @@ import System.Environment
 import System.IO
 import Text.Printf
 
+main :: IO ()
 main = do
     hSetEncoding stdout utf8
     [msg] <- getArgs
