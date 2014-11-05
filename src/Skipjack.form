@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="root" layout-manager="GridLayoutManager" row-count="15" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="500" height="572"/>
+      <xy x="20" y="20" width="500" height="600"/>
     </constraints>
     <properties/>
     <border type="empty">
@@ -218,7 +218,7 @@
         </constraints>
         <properties/>
       </component>
-      <component id="406b6" class="javax.swing.JButton" binding="вычислитьButton" default-binding="true">
+      <component id="406b6" class="javax.swing.JButton" binding="calculateSigButton" default-binding="true">
         <constraints>
           <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -242,7 +242,7 @@
           <text value="S"/>
         </properties>
       </component>
-      <component id="e98f2" class="javax.swing.JTextField" binding="textField2" default-binding="true">
+      <component id="e98f2" class="javax.swing.JTextField" binding="rField" default-binding="true">
         <constraints>
           <grid row="13" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
@@ -250,7 +250,7 @@
         </constraints>
         <properties/>
       </component>
-      <component id="3ecb" class="javax.swing.JTextField" binding="textField3" default-binding="true">
+      <component id="3ecb" class="javax.swing.JTextField" binding="sField" default-binding="true">
         <constraints>
           <grid row="14" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
@@ -263,6 +263,22 @@
           <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
+      </component>
+      <component id="44407" class="javax.swing.JButton" binding="verifyButton" default-binding="true">
+        <constraints>
+          <grid row="13" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Проверить"/>
+        </properties>
+      </component>
+      <component id="fe09a" class="javax.swing.JLabel" binding="verifyField">
+        <constraints>
+          <grid row="14" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
       </component>
     </children>
   </grid>

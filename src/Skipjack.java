@@ -23,9 +23,11 @@ public class Skipjack {
   private JTextField sigKey;
   private JButton    generateKeyButton;
   private JTextArea  textArea1;
-  private JButton    вычислитьButton;
-  private JTextField textField2;
-  private JTextField textField3;
+  private JButton    calculateSigButton;
+  private JTextField rField;
+  private JTextField sField;
+  private JButton    verifyButton;
+  private JLabel     verifyField;
 
   Timer timer = new Timer(1, null);
 
@@ -53,6 +55,30 @@ public class Skipjack {
       }
     });
     hashButton.addActionListener(e -> hash.setText(execute(new String[]{"./Hasher", hashMsg.getText()})));
+    generateKeyButton.addActionListener(e -> sigKey.setText(execute(new String[]{"./XGenerator"})));
+    calculateSigButton.addActionListener(e -> {
+      String[] strings = execute2(new String[]{"./Signaturer", sigKey.getText(), textArea1.getText()});
+      rField.setText(strings[0]);
+      sField.setText(strings[1]);
+    });
+    verifyButton.addActionListener(e -> verifyField.setText(execute(new String[]{"./Verifier", sigKey.getText(), textArea1.getText(), rField.getText(), sField.getText()})));
+  }
+
+  static String[] execute2(String[] commands) {
+    try {
+      Runtime r = Runtime.getRuntime();
+      Process p = r.exec(commands);
+      if (p.waitFor() == 0) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        return new String[]{reader.readLine(), reader.readLine()};
+      } else {
+        System.out.println(new BufferedReader(new InputStreamReader(p.getErrorStream())).readLine());
+        throw new RuntimeException();
+      }
+    } catch (IOException | InterruptedException e) {
+      e.printStackTrace();
+    }
+    throw new RuntimeException();
   }
 
   static String execute(String[] commands) {

@@ -12,3 +12,5 @@ Decryptor
 Encryptor
 Hasher
 XGenerator
+Signaturer
+Verifier
